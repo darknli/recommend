@@ -45,9 +45,9 @@ class RLTMF():
 #        print('length of test is ',len(self.test))
         
     
-    def __init__(self, N):
+    def __init__(self, N, f=2):
         
-        self.F = 10
+        self.F = f
         self.n = N#迭代次数
         self.a = 0.005
         self.b = 0.0
@@ -91,7 +91,8 @@ class RLTMF():
            # mae = MAE(test, p, q)
 #            print(step,':%.8f|%.8f'%(0.1, self.MAE('test')))
     #        print("RMSE is", rmse, end = '')
-            yield " %3d epoch :MAE is %f\n" % (step, train_mae/len(self.train))
+            yield step, train_mae / len(self.train)
+    #         yield " %3d epoch :MAE is %f\n" % (step, train_mae/len(self.train))
         yield "finish!"
     
     def Predict(self, u, i):
@@ -149,7 +150,7 @@ class RLTMF():
         
         
     def ReadModel(self, setTrain = False):
-        path = 'LFM'
+        path = 'model'
         q_file = 'q.txt'
         p_file = 'p.txt'
         test_file = 'test.txt'
@@ -160,8 +161,8 @@ class RLTMF():
         p_path = path + '/' + p_file
         test_path = path + '/' + test_file
         train_path = path + '/' + train_file
-        
-        
+
+
         file = open(q_path, 'r')
         qstr = file.read()
         self.q = eval(qstr)
@@ -221,7 +222,7 @@ class RLTMF():
         self.N = N
         self.item_test_all = set()
         self.user_test_all = set()
-        for u, i, r in self.test:
+        for u, i, r in self.train:
             self.item_test_all.add(i)
             self.user_test_all.add(u)
         print('物品：', len(self.item_test_all))    
@@ -230,7 +231,8 @@ class RLTMF():
         print('评估参数设置完成！')
             
     def TopN(self, user, choice='NOT_RATING'):
-        
+        if user not in self.p:
+            return None
         user_item = []
         if choice == 'NOT_RATING':
             for i in self.item_test_all:
@@ -265,15 +267,17 @@ class RLTMF():
 #                item_len.add(item[0])    
 #
         for u in self.user_test_all:
+            if u not in self.user_dict:
+                continue
             if u in self.p:
                 item_list = self.TopN(u, choice = 'NOT_RATING')
                 item_len = item_len|item_list
                 item_all = item_all|self.user_dict[u]
-        print('覆盖率', len(item_len)/len(self.item_test_all))
+        return '覆盖率 %.3f\n' % (len(item_len)/len(self.item_test_all))
 
     def PrecisionRecall(self):
         user_list = {}
-        for u, i, r in self.test:
+        for u, i, r in self.train:
             if u not in user_list:
                 user_list[u] = set()  
             user_list[u].add(i)
@@ -294,8 +298,7 @@ class RLTMF():
                 len_recall += len(user_list[u])
                 len_precision += self.N
             
-        print('准确率', hit/len_precision,hit,len_precision)
-        print('召回率', hit/len_recall)
+        return '准确率 %.3f\n' % (hit/len_precision) + '召回率%.3f\n' % (hit/len_recall)
         
         
         
@@ -312,7 +315,7 @@ class RLTMF():
             
     def get_userDict(self):
         self.user_dict = {}
-        for u, i, r in self.test:
+        for u, i, r in self.train:
             if u not in self.user_dict:
                 self.user_dict[u] = set()
             self.user_dict[u].add(i)
@@ -330,7 +333,6 @@ class RLTMF():
     
     def Diversity(self):
         self.get_itemDict()
-        rec_set = set()
         sim_dict = {}
         diver_all = 0          #总的多样性
         
@@ -356,7 +358,7 @@ class RLTMF():
 #            print(additem)
             diver_all += additem
         diver_all /= len(self.user_test_all)
-        print('多样性:', diver_all)
+        return '多样性:%.3f\n' % diver_all
         
 if __name__ == '__main__':
 
@@ -364,12 +366,12 @@ if __name__ == '__main__':
     #    Ff = F + i * 20
     #    print('F is',Ff)
     #    LearningLFM(train, Ff, n, a, b, test)
-    model = RLTMF(10)
+    model = RLTMF(10, 10)
     model.InitList_movielens('ratings.dat')
     for epoch_info in model.fit():
         print(epoch_info)
-    #model.fit()
-    #model.RecordModel()
+    # # model.fit()
+    model.RecordModel()
     # model.ReadModel(setTrain = True)
     # #
     # model.setEvalPara(70)

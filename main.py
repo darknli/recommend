@@ -68,7 +68,7 @@ def user_sign_up():
     window_sign_up.title('Sign up window')
 
     new_name = tk.StringVar()
-    new_name.set('1')
+    # new_name.set('1')
     tk.Label(window_sign_up, bg='Light blue', text='用户名:').place(x=10, y=10)
     entry_user_name = tk.Entry(window_sign_up, textvariable=new_name)
     entry_user_name.place(x=150, y=10)
@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
     # ------------用于用户名输入的文本框--------------#
     var_user_name = tk.StringVar()
-    var_user_name.set('1')
+    var_user_name.set('darkn')
 
     entry_user_name = tk.Entry(window, textvariable=var_user_name)
     entry_user_name.place(x=160, y=200)

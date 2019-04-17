@@ -4,27 +4,6 @@ Created on Tue Apr  3 10:14:50 2018
 
 @author: Darkn
 """
-
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Mar 13 15:42:19 2018
-
-@author: Darkn
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jan 16 15:41:46 2018
-
-@author: Darkn
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Dec  5 10:27:32 2017
-
-@author: Darkn
-"""
 import numpy as np
 import random
 import math
@@ -48,14 +27,14 @@ class BLFM:
             for line in lines:
                 fields = line.strip().split(token)
                 self.train.append(fields[:3])
-                # if random.randint(1,100)>1:
+                # if random.randint(1,100) > 1:
                 #     self.train.append(fields[:3])
                 # else:
                 #     self.test.append(fields[:3])
         print('reading the data was done!\nthe length of train is ',len(self.train))
-        print('length of test is ',len(self.test))
+        print('length of test is ', len(self.test))
     
-    def __init__(self, filename, N =15):
+    def __init__(self, filename, N=15):
         self.InitList_movielens(filename)
         self.F = 10
         self.n = N#迭代次数
@@ -259,7 +238,7 @@ class BLFM:
     #        print('p', p[u])
     #        print('q', q[i])        
 #            print(No, ':%.8f|%.8f'%(self.MAE('test'), self.MAE('train')))
-            yield " %3d epoch :MAE is %f\n" % (step, self.MAE('train') / len(self.train))
+            yield (step, self.MAE('train'))
     #        print('%.6f'%MAEAll(p, q))
         yield 'finish!!!'
         self.DelLFM()
@@ -291,17 +270,21 @@ class BLFM:
     def MAE(self, style = 'test'):
         'Score prediction Method of MAE'
         Sum = 0
+        count = 0
         if style == 'test':
             for u, i, rui in self.test:
                 if u in self.p and i in self.q:
                     Sum += math.fabs(float(rui) - self.Predict(u, i))
+                    count += 1
 #                    print((rui) ,':',self.Predict(u, i))
-            return Sum/len(self.test)
+            return Sum/count
         else:
             for u, i, rui in self.train:
                 if u in self.p and i in self.q:
                     Sum += math.fabs(float(rui) - self.Predict(u, i))
-            return Sum/len(self.train)
+                    count += 1
+                    # print(math.fabs(float(rui) - self.Predict(u, i)))
+            return Sum/count
         
     def setEvalPara(self,N = 10):
         '推荐列表长度，通常top10'
@@ -327,7 +310,7 @@ class BLFM:
                     
                     r = self.Predict(user, i)
                     user_item.append((i,r))
-            return set([elem[0] for elem in (sorted(user_item,key = lambda item:item[1])[:self.N])])
+            return set([elem[0] for elem in (sorted(user_item, key=lambda item:item[1])[:self.N])])
         else:
             for i in self.item_test_all:
                 if i in self.q:

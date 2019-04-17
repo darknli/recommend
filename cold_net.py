@@ -187,7 +187,7 @@ class cold_model():
         for i in range(EPOCH):
             MAE, RMSE = self.train(data.train.ratings, data.item_actors, data.item_country,
                                  data.item_director, data.item_genres, LEARNRATE)
-            yield " %3d epoch :MAE is %f\n" % (i, MAE)
+            yield (i, MAE)
             # logger.info('%d epoch the train MAE %f, RMSE %f' %
             #             (i, MAE / train_len, RMSE / train_len))
             # MAE, RMSE = CM.test(data.test.ratings, data.item_actors, data.item_country,
