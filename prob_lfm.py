@@ -267,7 +267,7 @@ class BLFM:
     #    print(len(test))
         return math.sqrt(Sum/len(self.Test))
     
-    def MAE(self, style = 'test'):
+    def MAE(self, style='test'):
         'Score prediction Method of MAE'
         Sum = 0
         count = 0
